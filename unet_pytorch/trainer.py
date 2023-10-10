@@ -32,8 +32,8 @@ def fit_model(
     for epoch in range(epochs):
         epoch_loss = 0
         epoch_accuracy = 0
-        epoch_dice_score = 0
-        epoch_jaccard_score = 0
+        # epoch_dice_score = 0
+        # epoch_jaccard_score = 0
 
         for batch in tqdm(train_loader, desc=f"Train Epoch {epoch+1}/{epochs}" ):
             images, masks = batch
@@ -51,46 +51,46 @@ def fit_model(
             optimizer.step()
 
             accuracy = (outputs.argmax(dim=1) == masks).float().mean()
-            dice_score = monai.metrics.compute_meandice(
-                y_pred=outputs.argmax(dim=1),
-                y=mask,
-                include_background=False,
-            )
-            jaccard_score = monai.metrics.compute_meandice(
-                y_pred=outputs.argmax(dim=1),
-                y=mask,
-                include_background=False,
-            )
+            # dice_score = monai.metrics.compute_meandice(
+            #     y_pred=outputs.argmax(dim=1),
+            #     y=mask,
+            #     include_background=False,
+            # )
+            # jaccard_score = monai.metrics.compute_meandice(
+            #     y_pred=outputs.argmax(dim=1),
+            #     y=mask,
+            #     include_background=False,
+            # )
 
             epoch_loss += loss_value.item()
             epoch_accuracy += accuracy.item()
-            epoch_dice_score += dice_score.item()
-            epoch_jaccard_score += jaccard_score.item()
+            # epoch_dice_score += dice_score.item()
+            # epoch_jaccard_score += jaccard_score.item()
 
         epoch_loss /= len(train_loader)
         epoch_accuracy /= len(train_loader)
-        epoch_dice_score /= len(train_loader)
-        epoch_jaccard_score /= len(train_loader)
+        # epoch_dice_score /= len(train_loader)
+        # epoch_jaccard_score /= len(train_loader)
 
         history["train_loss"].append(epoch_loss)
         history["train_accuracy"].append(epoch_accuracy)
-        history["train_dice_score"].append(epoch_dice_score)
-        history["train_jaccard_score"].append(epoch_jaccard_score)
+        # history["train_dice_score"].append(epoch_dice_score)
+        # history["train_jaccard_score"].append(epoch_jaccard_score)
 
         print(
             f"train epoch {epoch + 1}: "
             f"loss {epoch_loss:.4f}, "
             f"accuracy {epoch_accuracy:.4f}, "
-            f"dice score {epoch_dice_score:.4f}, "
-            f"jaccard score {epoch_jaccard_score:.4f}, "
+            # f"dice score {epoch_dice_score:.4f}, "
+            # f"jaccard score {epoch_jaccard_score:.4f}, "
         )
 
         model.eval()
 
         epoch_loss = 0
         epoch_accuracy = 0
-        epoch_dice_score = 0
-        epoch_jaccard_score = 0
+        # epoch_dice_score = 0
+        # epoch_jaccard_score = 0
 
         with torch.no_grad():
             for batch in tqdm(valid_loader):
@@ -104,38 +104,38 @@ def fit_model(
                 loss_value = loss(outputs, masks)
 
                 accuracy = (outputs.argmax(dim=1) == masks).float().mean()
-                dice_score = monai.metrics.compute_meandice(
-                    y_pred=outputs.argmax(dim=1),
-                    y=mask,
-                    include_background=False,
-                )
-                jaccard_score = monai.metrics.compute_meandice(
-                    y_pred=outputs.argmax(dim=1),
-                    y=mask,
-                    include_background=False,
-                )
+                # dice_score = monai.metrics.compute_meandice(
+                #     y_pred=outputs.argmax(dim=1),
+                #     y=mask,
+                #     include_background=False,
+                # )
+                # jaccard_score = monai.metrics.compute_meandice(
+                #     y_pred=outputs.argmax(dim=1),
+                #     y=mask,
+                #     include_background=False,
+                # )
 
                 epoch_loss += loss_value.item()
                 epoch_accuracy += accuracy.item()
-                epoch_dice_score += dice_score.item()
-                epoch_jaccard_score += jaccard_score.item()
+                # epoch_dice_score += dice_score.item()
+                # epoch_jaccard_score += jaccard_score.item()
 
             epoch_loss /= len(valid_loader)
             epoch_accuracy /= len(valid_loader)
-            epoch_dice_score /= len(valid_loader)
-            epoch_jaccard_score /= len(valid_loader)
+            # epoch_dice_score /= len(valid_loader)
+            # epoch_jaccard_score /= len(valid_loader)
 
             history["valid_loss"].append(epoch_loss)
             history["valid_accuracy"].append(epoch_accuracy)
-            history["valid_dice_score"].append(epoch_dice_score)
-            history["valid_jaccard_score"].append(epoch_jaccard_score)
+            # history["valid_dice_score"].append(epoch_dice_score)
+            # history["valid_jaccard_score"].append(epoch_jaccard_score)
 
             print(
                 f"valid epoch {epoch + 1}: "
                 f"loss {epoch_loss:.4f}, "
                 f"accuracy {epoch_accuracy:.4f}, "
-                f"dice score {epoch_dice_score:.4f}, "
-                f"jaccard score {epoch_jaccard_score:.4f}, "
+                # f"dice score {epoch_dice_score:.4f}, "
+                # f"jaccard score {epoch_jaccard_score:.4f}, "
             )
 
     return model, history
