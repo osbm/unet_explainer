@@ -11,8 +11,8 @@ class ProstateDataset(torch.utils.data.Dataset):
         self.folder = Path(folder)
         self.transform = transform
 
-        self.images = os.listdir(self.folder / "image")
-        self.masks = os.listdir(self.folder / "mask")
+        self.images = sorted(os.listdir(self.folder / "image"))
+        self.masks = sorted(os.listdir(self.folder / "mask"))
 
     def __len__(self):
         return len(self.images)
