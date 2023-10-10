@@ -2,7 +2,7 @@ from typing import Tuple
 from torch import nn
 import torch
 import monai
-
+from tqdm import tqdm
 
 def fit_model(
     model: nn.Module=None,
