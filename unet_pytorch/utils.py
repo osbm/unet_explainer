@@ -43,3 +43,22 @@ def plot_history(history: dict):
         plt.xlabel("Epochs")
         plt.ylabel(plot_type)
         plt.show()
+
+
+def plot_overlay(image, mask, alpha=0.5):
+    plt.imshow(image, cmap='gray')
+    plt.imshow(mask, cmap='jet', alpha=alpha)
+    plt.axis('off')
+    plt.show()
+
+def plot_overlay_4x4(batch, alpha=0.5):
+    images, masks = batch
+    fig, ax = plt.subplots(4, 4, figsize=(16, 16))
+    for i in range(4):
+        for j in range(4):
+            image = images[i * 4 + j]
+            mask = masks[i * 4 + j]
+            ax[i, j].imshow(image[0], cmap='gray')
+            ax[i, j].imshow(mask[0], cmap='jet', alpha=alpha)
+            ax[i, j].axis('off')
+    plt.show()

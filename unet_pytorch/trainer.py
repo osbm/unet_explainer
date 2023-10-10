@@ -131,7 +131,7 @@ def fit_model(
             # history["valid_jaccard_score"].append(epoch_jaccard_score)
 
             print(
-                f"vsalid epoch {epoch + 1}: "
+                f"valid epoch {epoch + 1}: "
                 f"loss {epoch_loss:.4f}, "
                 f"accuracy {epoch_accuracy:.4f}, "
                 # f"dice score {epoch_dice_score:.4f}, "

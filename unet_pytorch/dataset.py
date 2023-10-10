@@ -37,6 +37,9 @@ class ProstateDataset(torch.utils.data.Dataset):
         mask[mask == 255] = 2
         mask = mask.unsqueeze(0)
 
+        image = image.float() / 255.0
+        mask = mask.float() / 2.0
+
         return image, mask
 
 
@@ -45,13 +48,19 @@ def get_transforms(image_size=512):
         A.Resize(height=image_size, width=image_size),
         A.HorizontalFlip(p=0.5),
         A.VerticalFlip(p=0.5),
-        A.Normalize(mean=[0.5], std=[0.5]),
+        # random rotate 5 degrees
+        A.Rotate(limit=5, p=0.5),
+        # random offset 10 pixels
+        A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.0, rotate_limit=0, p=0.5),
+        # random brightness and contrast
+        A.RandomBrightnessContrast(p=0.5),
+        # A.Normalize(mean=[0.5], std=[0.5]),
         ToTensorV2(),
     ])
 
     valid_transforms = A.Compose([
-        A.Resize(height=512, width=512),
-        A.Normalize(mean=[0.5], std=[0.5]),
+        A.Resize(height=image_size, width=image_size),
+        # A.Normalize(mean=[0.5], std=[0.5]),
         ToTensorV2(),
     ])
 
