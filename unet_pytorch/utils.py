@@ -22,3 +22,17 @@ def plot_image_batch(image, mask, num_examples_to_plot=3):
         ax[1][i].axis("off")
     plt.tight_layout()
     plt.show()
+
+def plot_history(history: dict):
+    keys = list(history.keys())
+    plot_types = [key.replace("train_", "") for key in keys if "train" in key]
+    
+    for plot_type in plot_types:
+        plt.figure(figsize=(10, 5))
+        plt.plot(history[f"train_{plot_type}"], label=f"train_{plot_type}")
+        plt.plot(history[f"valid_{plot_type}"], label=f"valid_{plot_type}")
+        plt.legend()
+        plt.title(f"{plot_type.capitalize()} History")
+        plt.xlabel("Epochs")
+        plt.ylabel(plot_type)
+        plt.show()

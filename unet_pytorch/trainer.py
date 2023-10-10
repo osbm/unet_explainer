@@ -35,7 +35,7 @@ def fit_model(
         epoch_dice_score = 0
         epoch_jaccard_score = 0
 
-        for batch in train_loader:
+        for batch in tqdm(train_loader, desc=f"Train Epoch {epoch+1}/{epochs}" ):
             images, masks = batch
             images = images.to(device)
             masks = masks.to(device)
@@ -93,7 +93,7 @@ def fit_model(
         epoch_jaccard_score = 0
 
         with torch.no_grad():
-            for batch in valid_loader:
+            for batch in tqdm(valid_loader):
                 images, masks = batch
                 images = images.to(device)
                 masks = masks.to(device)
@@ -139,3 +139,31 @@ def fit_model(
             )
 
     return model, history
+
+
+def predict(
+    model: nn.Module=None,
+    test_loader: torch.utils.data.DataLoader=None,
+    device: torch.types.Device=None,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+
+    model.eval()
+
+    y_pred = []
+    y = []
+    with torch.no_grad():
+        for batch in tqdm(test_loader):
+            images, masks = batch
+            images = images.to(device)
+            masks = masks.to(device)
+
+            outputs = model(images)
+            outputs = torch.softmax(outputs, dim=1)
+
+            y_pred.append(outputs.argmax(dim=1).detach().cpu())
+            y.append(masks.detach().cpu())
+
+    y_pred = torch.cat(y_pred)
+    y = torch.cat(y)
+
+    return y_pred, y
