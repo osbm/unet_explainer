@@ -32,11 +32,10 @@ class ProstateDataset(torch.utils.data.Dataset):
             image = torch.from_numpy(image)
             mask = torch.from_numpy(mask)
 
-        # mask one-hot encoding
-        mask_background = (mask == 0).float()
-        mask_label1 = (mask == 128).float()
-        mask_label2 = (mask == 255).float()
-        mask = torch.stack([mask_background, mask_label1, mask_label2])
+        # mask values are 0, 1, 2 but in this image we have 0, 128, 255 lets fix this
+        mask[mask == 128] = 1
+        mask[mask == 255] = 2
+        mask.unsqueeze(0)
 
         return image, mask
 
