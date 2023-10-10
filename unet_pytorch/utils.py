@@ -1,7 +1,14 @@
 import matplotlib.pyplot as plt
 
+def set_seed(seed=42):
+    import random
+    import numpy as np
+    import torch
 
-
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    print(f"Seed set to {seed}.")
 def get_parameter_number(model=None):
     # pytorch_total_params
     total = 0
