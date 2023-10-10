@@ -23,11 +23,11 @@ def fit_model(
         "train_accuracy": [],
         "valid_accuracy": [],
         # dice score
-        "train_dice_score": [],
-        "valid_dice_score": [],
+        # "train_dice_score": [],
+        # "valid_dice_score": [],
         # jacard score
-        "train_jaccard_score": [],
-        "valid_jaccard_score": [],
+        # "train_jaccard_score": [],
+        # "valid_jaccard_score": [],
     }
     for epoch in range(epochs):
         epoch_loss = 0
@@ -35,7 +35,7 @@ def fit_model(
         # epoch_dice_score = 0
         # epoch_jaccard_score = 0
 
-        for batch in tqdm(train_loader, desc=f"Train Epoch {epoch+1}/{epochs}"):
+        for batch in tqdm(train_loader, desc=f"Train Epoch {epoch+1}/{epochs}", leave=False):
             images, masks = batch
             images = images.to(device)
             masks = masks.to(device)
@@ -93,7 +93,7 @@ def fit_model(
         # epoch_jaccard_score = 0
 
         with torch.no_grad():
-            for batch in tqdm(valid_loader, desc=f"Valid Epoch {epoch+1}/{epochs}"):
+            for batch in tqdm(valid_loader, desc=f"Valid Epoch {epoch+1}/{epochs}", leave=False):
                 images, masks = batch
                 images = images.to(device)
                 masks = masks.to(device)
