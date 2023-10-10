@@ -4,3 +4,7 @@ train/
 test/
 valid/
 *.pyc
+
+# module stuff
+build/
+unet_pytorch.egg-info/

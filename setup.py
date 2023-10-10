@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name = "unet_pytorch",
@@ -7,6 +7,6 @@ setup(
     author_email = "osmanfbayram@gmail.com",
     description = ("An unet pytorch tutorial"),
     license = "MIT",
-    requires=['torch', 'torchvision', 'monai', 'albumentations', 'matplotlib', 'numpy', 'pandas', 'tqdm', 'scikit-image', 'scikit-learn', 'seaborn', 'SimpleITK'],
-    packages=['unet_pytorch'],
+    install_requires=['torch', 'torchvision', 'monai', 'albumentations', 'matplotlib', 'numpy', 'pandas', 'tqdm', 'scikit-image', 'scikit-learn', 'seaborn', 'SimpleITK'],
+    packages=find_packages(exclude=['scripts']),
 )
