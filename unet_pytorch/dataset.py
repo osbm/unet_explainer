@@ -35,7 +35,7 @@ class ProstateDataset(torch.utils.data.Dataset):
         # mask one-hot encoding
         mask_background = (mask == 0).float()
         mask_label1 = (mask == 128).float()
-        mask_label1 = (mask == 255).float()
+        mask_label2 = (mask == 255).float()
         mask = torch.stack([mask_background, mask_label1, mask_label2])
 
         return image, mask
