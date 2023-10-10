@@ -8,11 +8,11 @@ import numpy as np
 from pathlib import Path
 import os
 
-dspath = Path("data/")
+dspath = Path("data-raw/")
 
-train_df = pd.read_csv("data/train.csv")
-valid_df = pd.read_csv("data/valid.csv")
-test_df = pd.read_csv("data/test.csv")
+train_df = pd.read_csv("data-raw/train.csv")
+valid_df = pd.read_csv("data-raw/valid.csv")
+test_df = pd.read_csv("data-raw/test.csv")
 
 train_df["image"] = train_df["t2"]
 valid_df["image"] = valid_df["t2"]
@@ -57,6 +57,6 @@ def process_df(df, output_dir):
             matplotlib.image.imsave(output_dir / "mask" / f'patient_{patient_index}_{mask_idx}.png', mask_array, cmap="gray")
             mask_idx += 1
 
-process_df(train_df, "train")
-process_df(valid_df, "valid")
-process_df(test_df, "test")
+process_df(train_df, "data/train")
+process_df(valid_df, "data/valid")
+process_df(test_df, "data/test")

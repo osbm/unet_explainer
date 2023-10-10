@@ -1,10 +1,12 @@
 .venv/
 data/
+data-raw/
 train/
 test/
 valid/
 *.pyc
-
+data.zip
+data-raw.zip
 # module stuff
 build/
 unet_pytorch.egg-info/
