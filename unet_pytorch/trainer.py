@@ -6,8 +6,8 @@ import monai
 
 def fit_model(
     model: nn.Module=None,
-    train_loader: torch.utils.data.Dataloader=None,
-    valid_loader: torch.utils.data.Dataloader=None,
+    train_loader: torch.utils.data.DataLoader=None,
+    valid_loader: torch.utils.data.DataLoader=None,
     optimizer: torch.optim.Optimizer=None,
     loss: nn.Module=None,
     device: torch.types.Device=None,
