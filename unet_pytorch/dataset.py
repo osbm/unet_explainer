@@ -35,7 +35,7 @@ class ProstateDataset(torch.utils.data.Dataset):
         # mask values are 0, 1, 2 but in this image we have 0, 128, 255 lets fix this
         mask[mask == 128] = 1
         mask[mask == 255] = 2
-        mask.unsqueeze(0)
+        mask = mask.unsqueeze(0)
 
         return image, mask
 
