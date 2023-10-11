@@ -10,3 +10,4 @@ data-raw.zip
 # module stuff
 build/
 unet_pytorch.egg-info/
+best_model.pth

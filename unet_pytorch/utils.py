@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 
 def set_seed(seed=42):
     import random
@@ -66,6 +67,18 @@ def plot_overlay_4x4(batch, alpha=0.5):
             ax[i, j].axis('off')
     plt.show()
 
+def plot_overlay_4x2(batch, alpha=0.5):
+    images, masks = batch
+    fig, ax = plt.subplots(4, 2, figsize=(16, 16))
+    for i in range(4):
+        for j in range(2):
+            image = images[i * 2 + j]
+            mask = masks[i * 2 + j]
+            ax[i, j].imshow(image[0], cmap='gray')
+            ax[i, j].imshow(mask[0], cmap='jet', alpha=alpha)
+            ax[i, j].axis('off')
+    plt.show()
+
 def plot_predictions(x, y, y_pred, num_examples_to_plot=3, shuffle=True):
     fig, ax = plt.subplots(num_examples_to_plot, 3, figsize=(9, num_examples_to_plot * 3))
     for i in range(num_examples_to_plot):
@@ -82,7 +95,41 @@ def plot_predictions(x, y, y_pred, num_examples_to_plot=3, shuffle=True):
         ax[i][2].imshow(image[0].squeeze(), cmap="gray")
         ax[i][2].imshow(pred_mask.squeeze(), cmap="jet", alpha=0.5)
         ax[i][0].axis("off")
+        ax[i][0].set_title("Image")
         ax[i][1].axis("off")
+        ax[i][1].set_title("Ground Truth")
         ax[i][2].axis("off")
+        ax[i][2].set_title("Prediction")
+    plt.tight_layout()
+    plt.show()
+
+def plot_one_example(x, y):
+    y = y.type(torch.int64)
+    y_one_hot = torch.nn.functional.one_hot(y, 3).transpose(1, 3).squeeze(-1)
+    # now i need to rotate this image 90 degrees clockwise
+    y_one_hot = y_one_hot.transpose(2, 3)
+
+    fig, ax = plt.subplots(1, 5, figsize=(20, 5))
+    ax[0].imshow(x[0].squeeze(), cmap="gray")
+    ax[1].imshow(y_one_hot[0][0].squeeze(), cmap="gray")
+    ax[2].imshow(y_one_hot[0][1].squeeze(), cmap="gray")
+    ax[3].imshow(y_one_hot[0][2].squeeze(), cmap="gray")
+    ax[4].imshow(x[0].squeeze(), cmap="gray")
+    ax[4].imshow(y.squeeze(), cmap="jet", alpha=0.5)
+    
+
+    ax[0].axis("off")
+    ax[1].axis("off")
+    ax[2].axis("off")
+    ax[3].axis("off")
+    ax[4].axis("off")
+
+    # add titles
+    ax[0].set_title("Image")
+    ax[1].set_title("Background")
+    ax[2].set_title("Prostate inner (PZ)")
+    ax[3].set_title("Prostate outer (TZ)")
+    ax[4].set_title("Overlay")
+
     plt.tight_layout()
     plt.show()

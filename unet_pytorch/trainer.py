@@ -1,5 +1,8 @@
 import torch
 from tqdm import tqdm
+from monai.metrics import DiceHelper
+from torchmetrics import JaccardIndex
+
 
 def fit_model(
     model=None,
@@ -15,10 +18,18 @@ def fit_model(
     history = {
         "train_loss": [],
         "valid_loss": [],
+        "train_dice": [],
+        "valid_dice": [],
+        "train_iou": [],
+        "valid_iou": [],
     }
+
+    dice_metric = DiceHelper(include_background=True, softmax=True, reduction="mean")
+    iou_metric = JaccardIndex(num_classes=3, task="multiclass").to(device)
     for epoch in range(epochs):
         train_epoch_loss = 0
-
+        train_dice_scores = 0
+        train_iou_scores = 0
         for images, masks in tqdm(train_loader, desc=f"Train Epoch {epoch+1}/{epochs}", leave=False):
             images = images.to(device)
             masks = masks.to(device)
@@ -27,17 +38,30 @@ def fit_model(
             outputs = model(images)
             loss_value = loss(outputs, masks)
             loss_value.backward()
+
+            dice_score, _ = dice_metric(outputs, masks)
+
+            iou_score = iou_metric(outputs.argmax(dim=1), masks.squeeze())
+            train_dice_scores += dice_score.item()
+            train_iou_scores += iou_score.item()
+            train_epoch_loss += loss_value.item()
+
             # torch.nn.utils.clip_grad_norm_(model.parameters(), 1)
             optimizer.step()
 
-            train_epoch_loss += loss_value.item()
 
         train_epoch_loss /= len(train_loader)
+        train_dice_scores /= len(train_loader)
+        train_iou_scores /= len(train_loader)
 
         history["train_loss"].append(train_epoch_loss)
+        history["train_dice"].append(train_dice_scores)
+        history["train_iou"].append(train_iou_scores)
 
         model.eval()
         valid_epoch_loss = 0
+        valid_dice_scores = 0
+        valid_iou_scores = 0
 
         with torch.no_grad():
             for images, masks in tqdm(valid_loader, desc=f"Valid Epoch {epoch+1}/{epochs}", leave=False):
@@ -47,38 +71,63 @@ def fit_model(
                 outputs = model(images)
                 loss_value = loss(outputs, masks)
 
+                dice_score, _ = dice_metric(outputs, masks)
+                iou_score = iou_metric(outputs.argmax(dim=1), masks.squeeze())
+
+
+                valid_dice_scores += dice_score.item()
+                valid_iou_scores += iou_score.item()
                 valid_epoch_loss += loss_value.item()
 
-
+        valid_dice_scores /= len(valid_loader)
+        valid_iou_scores /= len(valid_loader)
         valid_epoch_loss /= len(valid_loader)
+
+        history["valid_dice"].append(valid_dice_scores)
+        history["valid_iou"].append(valid_iou_scores)
+        history["valid_loss"].append(valid_epoch_loss)
+
+
         if valid_epoch_loss < best_valid_loss:
             best_valid_loss = valid_epoch_loss
             print("Saving better model to best_model.pth")
             torch.save(model.state_dict(), "best_model.pth")
-        history["valid_loss"].append(valid_epoch_loss)
 
         print(
             f"Epoch {epoch + 1}/{epochs}: "
             f"loss {train_epoch_loss:.4f}/{valid_epoch_loss:.4f}, "
+            f"dice {train_dice_scores:.4f}/{valid_dice_scores:.4f}, "
+            f"iou {train_iou_scores:.4f}/{valid_iou_scores:.4f}"
         )
 
     return model, history
 
 
-def predict(model, test_loader=None, device=None, final_activation=None):
+def predict(model, test_loader=None, device=None, final_activation="softmax", calculate_scores=True):
     model.eval()
 
     x = []
     y_pred = []
     y = []
+
+
     with torch.no_grad():
         for images, masks in tqdm(test_loader):
             images, masks = images.to(device), masks.to(device)
             
 
             outputs = model(images)
-            if final_activation is not None:
-                outputs = final_activation(outputs)
+            
+            if final_activation == "softmax":
+                outputs = torch.softmax(outputs, dim=1)
+            elif final_activation == "sigmoid":
+                outputs = torch.sigmoid(outputs)
+            elif final_activation == "none":
+                pass
+            else:
+                raise ValueError("final_activation must be either softmax, sigmoid or none")
+
+
             y_pred.append(outputs.argmax(dim=1).detach().cpu())
             y.append(masks.detach().cpu())
             x.append(images.detach().cpu())
@@ -86,5 +135,15 @@ def predict(model, test_loader=None, device=None, final_activation=None):
     x = torch.cat(x)
     y = torch.cat(y)
     y_pred = torch.cat(y_pred)
+
+    if calculate_scores:
+        dice_metric = DiceHelper(include_background=True, reduction="mean")
+        iou_metric = JaccardIndex(num_classes=3, task="multiclass")
+
+        dice_score, _ = dice_metric(y_pred, y)
+        iou_score = iou_metric(y_pred, y.squeeze())
+
+        print(f"Dice score: {dice_score.item()}")
+        print(f"IoU score: {iou_score}")
 
     return x, y, y_pred
