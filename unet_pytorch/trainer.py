@@ -47,7 +47,7 @@ def fit_model(
 
             loss_value = loss(outputs, masks)
             loss_value.backward()
-
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1)
             optimizer.step()
 
             accuracy = (outputs.argmax(dim=1) == masks).float().mean()

@@ -9,6 +9,8 @@ def set_seed(seed=42):
     np.random.seed(seed)
     torch.manual_seed(seed)
     print(f"Seed set to {seed}.")
+
+    
 def get_parameter_number(model=None):
     # pytorch_total_params
     total = 0
