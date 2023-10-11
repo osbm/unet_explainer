@@ -43,7 +43,6 @@ def fit_model(
             optimizer.zero_grad()
 
             outputs = model(images)
-            outputs = torch.softmax(outputs, dim=1)
 
             loss_value = loss(outputs, masks)
             loss_value.backward()
@@ -99,8 +98,6 @@ def fit_model(
                 masks = masks.to(device)
 
                 outputs = model(images)
-                outputs = torch.softmax(outputs, dim=1)
-
                 loss_value = loss(outputs, masks)
 
                 accuracy = (outputs.argmax(dim=1) == masks).float().mean()
@@ -141,7 +138,7 @@ def fit_model(
     return model, history
 
 
-def predict(model, test_loader=None, device=None):
+def predict(model, test_loader=None, device=None, final_activation=None):
 
     model.eval()
 
@@ -154,8 +151,8 @@ def predict(model, test_loader=None, device=None):
             masks = masks.to(device)
 
             outputs = model(images)
-            outputs = torch.softmax(outputs, dim=1)
-
+            if final_activation is not None:
+                outputs = final_activation(outputs)
             y_pred.append(outputs.argmax(dim=1).detach().cpu())
             y.append(masks.detach().cpu())
             x.append(images.detach().cpu())
