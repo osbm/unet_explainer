@@ -78,7 +78,7 @@ def fit_model(
         # history["train_jaccard_score"].append(epoch_jaccard_score)
 
         print(
-            f"train epoch {epoch + 1}: "
+            f"Train Epoch {epoch + 1}: "
             f"loss {epoch_loss:.4f}, "
             f"accuracy {epoch_accuracy:.4f}, "
             # f"dice score {epoch_dice_score:.4f}, "
@@ -131,7 +131,7 @@ def fit_model(
             # history["valid_jaccard_score"].append(epoch_jaccard_score)
 
             print(
-                f"valid epoch {epoch + 1}: "
+                f"Valid Epoch {epoch + 1}: "
                 f"loss {epoch_loss:.4f}, "
                 f"accuracy {epoch_accuracy:.4f}, "
                 # f"dice score {epoch_dice_score:.4f}, "
@@ -149,6 +149,7 @@ def predict(
 
     model.eval()
 
+    x = []
     y_pred = []
     y = []
     with torch.no_grad():
@@ -162,8 +163,9 @@ def predict(
 
             y_pred.append(outputs.argmax(dim=1).detach().cpu())
             y.append(masks.detach().cpu())
+            x.append(images.detach().cpu())
 
     y_pred = torch.cat(y_pred)
     y = torch.cat(y)
 
-    return y_pred, y
+    return x, y, y_pred

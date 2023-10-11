@@ -62,3 +62,19 @@ def plot_overlay_4x4(batch, alpha=0.5):
             ax[i, j].imshow(mask[0], cmap='jet', alpha=alpha)
             ax[i, j].axis('off')
     plt.show()
+
+def plot_predictions(x, y, y_pred, num_examples_to_plot=3, shuffle=True):
+    if shuffle:
+        indices = np.random.choice(range(x.shape[0]), num_examples_to_plot, replace=False)
+    else:
+        indices = range(num_examples_to_plot)
+    fig, ax = plt.subplots(3, num_examples_to_plot, figsize=(num_examples_to_plot * 3, 9))
+    for i, idx in enumerate(indices):
+        ax[0][i].imshow(x[idx, 0], cmap="gray")
+        ax[1][i].imshow(y[idx, 0], cmap="gray")
+        ax[2][i].imshow(y_pred[idx, 0], cmap="gray")
+        ax[0][i].axis("off")
+        ax[1][i].axis("off")
+        ax[2][i].axis("off")
+    plt.tight_layout()
+    plt.show()
