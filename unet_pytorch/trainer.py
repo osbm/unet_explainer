@@ -11,7 +11,7 @@ def fit_model(
     epochs=10
 ):
     model.train()
-
+    best_valid_loss = float("inf")
     history = {
         "train_loss": [],
         "valid_loss": [],
@@ -50,14 +50,17 @@ def fit_model(
                 valid_epoch_loss += loss_value.item()
 
 
-            valid_epoch_loss /= len(valid_loader)
+        valid_epoch_loss /= len(valid_loader)
+        if valid_epoch_loss < best_valid_loss:
+            best_valid_loss = valid_epoch_loss
+            print("Saving better model to best_model.pth")
+            torch.save(model.state_dict(), "best_model.pth")
+        history["valid_loss"].append(valid_epoch_loss)
 
-            history["valid_loss"].append(valid_epoch_loss)
-
-            print(
-                f"Epoch {epoch + 1}/{epochs}: "
-                f"loss {train_epoch_loss:.4f}/{valid_epoch_loss:.4f}, "
-            )
+        print(
+            f"Epoch {epoch + 1}/{epochs}: "
+            f"loss {train_epoch_loss:.4f}/{valid_epoch_loss:.4f}, "
+        )
 
     return model, history
 

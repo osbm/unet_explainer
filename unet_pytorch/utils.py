@@ -12,7 +12,7 @@ def set_seed(seed=42):
     print(f"Seed set to {seed}.")
 
 
-def get_parameter_number(model=None):
+def print_model_info(model=None):
     # pytorch_total_params
     total = 0
     for p in model.parameters():
