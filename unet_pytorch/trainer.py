@@ -1,145 +1,65 @@
-from typing import Tuple
-from torch import nn
-import torch
-import monai
-from tqdm import tqdm
-
 def fit_model(
-    model: nn.Module=None,
-    train_loader: torch.utils.data.DataLoader=None,
-    valid_loader: torch.utils.data.DataLoader=None,
-    optimizer: torch.optim.Optimizer=None,
-    loss: nn.Module=None,
-    device: torch.types.Device=None,
-    epochs: int=10
-) -> Tuple[nn.Module, dict]:
+    model=None,
+    train_loader=None,
+    valid_loader=None,
+    optimizer=None,
+    loss=None,
+    device=None,
+    epochs=10
+):
     model.train()
 
     history = {
-        # loss
         "train_loss": [],
         "valid_loss": [],
-        # accuracy
-        "train_accuracy": [],
-        "valid_accuracy": [],
-        # dice score
-        # "train_dice_score": [],
-        # "valid_dice_score": [],
-        # jacard score
-        # "train_jaccard_score": [],
-        # "valid_jaccard_score": [],
     }
     for epoch in range(epochs):
-        epoch_loss = 0
-        epoch_accuracy = 0
-        # epoch_dice_score = 0
-        # epoch_jaccard_score = 0
+        train_epoch_loss = 0
 
-        for batch in tqdm(train_loader, desc=f"Train Epoch {epoch+1}/{epochs}", leave=False):
-            images, masks = batch
+        for images, masks in tqdm(train_loader, desc=f"Train Epoch {epoch+1}/{epochs}", leave=False):
             images = images.to(device)
             masks = masks.to(device)
 
             optimizer.zero_grad()
-
             outputs = model(images)
-
             loss_value = loss(outputs, masks)
             loss_value.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 1)
+            # torch.nn.utils.clip_grad_norm_(model.parameters(), 1)
             optimizer.step()
 
-            accuracy = (outputs.argmax(dim=1) == masks).float().mean()
-            # dice_score = monai.metrics.compute_meandice(
-            #     y_pred=outputs.argmax(dim=1),
-            #     y=mask,
-            #     include_background=False,
-            # )
-            # jaccard_score = monai.metrics.compute_meandice(
-            #     y_pred=outputs.argmax(dim=1),
-            #     y=mask,
-            #     include_background=False,
-            # )
+            train_epoch_loss += loss_value.item()
 
-            epoch_loss += loss_value.item()
-            epoch_accuracy += accuracy.item()
-            # epoch_dice_score += dice_score.item()
-            # epoch_jaccard_score += jaccard_score.item()
+        train_epoch_loss /= len(train_loader)
 
-        epoch_loss /= len(train_loader)
-        epoch_accuracy /= len(train_loader)
-        # epoch_dice_score /= len(train_loader)
-        # epoch_jaccard_score /= len(train_loader)
-
-        history["train_loss"].append(epoch_loss)
-        history["train_accuracy"].append(epoch_accuracy)
-        # history["train_dice_score"].append(epoch_dice_score)
-        # history["train_jaccard_score"].append(epoch_jaccard_score)
-
-        print(
-            f"Train Epoch {epoch + 1}: "
-            f"loss {epoch_loss:.4f}, "
-            f"accuracy {epoch_accuracy:.4f}, "
-            # f"dice score {epoch_dice_score:.4f}, "
-            # f"jaccard score {epoch_jaccard_score:.4f}, "
-        )
+        history["train_loss"].append(train_epoch_loss)
 
         model.eval()
-
-        epoch_loss = 0
-        epoch_accuracy = 0
-        # epoch_dice_score = 0
-        # epoch_jaccard_score = 0
+        valid_epoch_loss = 0
 
         with torch.no_grad():
-            for batch in tqdm(valid_loader, desc=f"Valid Epoch {epoch+1}/{epochs}", leave=False):
-                images, masks = batch
+            for images, masks in tqdm(valid_loader, desc=f"Valid Epoch {epoch+1}/{epochs}", leave=False):
                 images = images.to(device)
                 masks = masks.to(device)
 
                 outputs = model(images)
                 loss_value = loss(outputs, masks)
 
-                accuracy = (outputs.argmax(dim=1) == masks).float().mean()
-                # dice_score = monai.metrics.compute_meandice(
-                #     y_pred=outputs.argmax(dim=1),
-                #     y=mask,
-                #     include_background=False,
-                # )
-                # jaccard_score = monai.metrics.compute_meandice(
-                #     y_pred=outputs.argmax(dim=1),
-                #     y=mask,
-                #     include_background=False,
-                # )
+                valid_epoch_loss += loss_value.item()
 
-                epoch_loss += loss_value.item()
-                epoch_accuracy += accuracy.item()
-                # epoch_dice_score += dice_score.item()
-                # epoch_jaccard_score += jaccard_score.item()
 
-            epoch_loss /= len(valid_loader)
-            epoch_accuracy /= len(valid_loader)
-            # epoch_dice_score /= len(valid_loader)
-            # epoch_jaccard_score /= len(valid_loader)
+            valid_epoch_loss /= len(valid_loader)
 
-            history["valid_loss"].append(epoch_loss)
-            history["valid_accuracy"].append(epoch_accuracy)
-            # history["valid_dice_score"].append(epoch_dice_score)
-            # history["valid_jaccard_score"].append(epoch_jaccard_score)
+            history["valid_loss"].append(valid_epoch_loss)
 
             print(
-                f"Valid Epoch {epoch + 1}: "
-                f"loss {epoch_loss:.4f}, "
-                f"accuracy {epoch_accuracy:.4f}, "
-                # f"dice score {epoch_dice_score:.4f}, "
-                # f"jaccard score {epoch_jaccard_score:.4f}, "
+                f"Epoch {epoch + 1}/{epochs}: "
+                f"loss {train_epoch_loss:.4f}/{valid_epoch_loss:.4f}, "
             )
 
     return model, history
 
 
 def predict(model, test_loader=None, device=None, final_activation=None):
-
     model.eval()
 
     x = []
@@ -147,8 +67,8 @@ def predict(model, test_loader=None, device=None, final_activation=None):
     y = []
     with torch.no_grad():
         for images, masks in tqdm(test_loader):
-            images = images.to(device)
-            masks = masks.to(device)
+            images, masks = images.to(device), masks.to(device)
+            
 
             outputs = model(images)
             if final_activation is not None:

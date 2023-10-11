@@ -76,11 +76,11 @@ def plot_predictions(x, y, y_pred, num_examples_to_plot=3, shuffle=True):
         image = x[idx]
         mask = y[idx]
         pred_mask = y_pred[idx]
-        ax[i][0].imshow(image[0][0], cmap="gray")
-        ax[i][1].imshow(image[0][0], cmap="gray")
-        ax[i][1].imshow(mask[0], cmap="jet", alpha=0.5)
-        ax[i][2].imshow(image[0][0], cmap="gray")
-        ax[i][2].imshow(pred_mask, cmap="jet", alpha=0.5)
+        ax[i][0].imshow(image[0].squeeze(), cmap="gray")
+        ax[i][1].imshow(image[0].squeeze(), cmap="gray")
+        ax[i][1].imshow(mask.squeeze(), cmap="jet", alpha=0.5)
+        ax[i][2].imshow(image[0].squeeze(), cmap="gray")
+        ax[i][2].imshow(pred_mask.squeeze(), cmap="jet", alpha=0.5)
         ax[i][0].axis("off")
         ax[i][1].axis("off")
         ax[i][2].axis("off")
