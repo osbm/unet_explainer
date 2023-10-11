@@ -1,3 +1,6 @@
+import torch
+from tqdm import tqdm
+
 def fit_model(
     model=None,
     train_loader=None,
