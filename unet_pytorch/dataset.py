@@ -38,7 +38,7 @@ class ProstateDataset(torch.utils.data.Dataset):
         mask = mask.unsqueeze(0)
 
         image = image.float() / 255.0
-        mask = mask.float() / 2.0
+        # mask = mask.float() / 2.0
 
         return image, mask
 
