@@ -35,8 +35,8 @@ def process_df(df, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(output_dir / "image", exist_ok=True)
     os.makedirs(output_dir / "mask", exist_ok=True)
-
-    for patient_index, row in tqdm(df.iterrows(), total=len(df)):
+    imageid=0
+    for patient_index, row in tqdm(df.iterrows(), total=len(df), disable=True):
         mask_path = dspath / row["mask"]
         image_path = dspath / row["image"]
         mask = sitk.ReadImage(mask_path)
@@ -51,10 +51,22 @@ def process_df(df, output_dir):
         for i in range(mask.shape[0]):
             mask_array = mask[i]
             image_array = image[i]
-            if mask_array.sum() == 0:
+
+            # print labels to background ratio
+            existing_labels, counts = np.unique(mask_array, return_counts=True)
+
+            if len(existing_labels) != 3:
                 continue
-            matplotlib.image.imsave(output_dir / "image" / f'patient_{patient_index}_{mask_idx}.png', image_array, cmap="gray")
-            matplotlib.image.imsave(output_dir / "mask" / f'patient_{patient_index}_{mask_idx}.png', mask_array, cmap="gray")
+            
+            label_ratio = counts[1:].sum() / (mask_array.shape[0] * mask_array.shape[1])
+
+            if label_ratio < 0.08:
+                continue
+
+            print(imageid)
+            imageid+=1
+            # matplotlib.image.imsave(output_dir / "image" / f'patient_{patient_index}_{mask_idx}.png', image_array, cmap="gray")
+            # matplotlib.image.imsave(output_dir / "mask" / f'patient_{patient_index}_{mask_idx}.png', mask_array, cmap="gray")
             mask_idx += 1
 
 process_df(train_df, "data/train")
