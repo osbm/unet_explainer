@@ -133,3 +133,28 @@ def plot_one_example(x, y):
 
     plt.tight_layout()
     plt.show()
+
+
+def plot_comparison_examples(x1, x2):
+    # x1 includes a mask and an image
+    # x2 includes a mask and an image
+    # plot images and masks 2x2
+
+    fig, ax = plt.subplots(2, 2, figsize=(5, 5))
+    ax[0][0].imshow(x1[0].squeeze(), cmap="gray")
+    ax[0][1].imshow(x1[1].squeeze(), cmap="gray")
+    ax[1][0].imshow(x2[0].squeeze(), cmap="gray")
+    ax[1][1].imshow(x2[1].squeeze(), cmap="gray")
+
+    ax[0][0].axis("off")
+    ax[0][1].axis("off")
+    ax[1][0].axis("off")
+    ax[1][1].axis("off")
+
+    ax[0][0].set_title("Image 1")
+    ax[0][1].set_title("Mask 1")
+    ax[1][0].set_title("Image 2")
+    ax[1][1].set_title("Mask 2")
+
+    plt.tight_layout()
+    plt.show()

@@ -8,7 +8,7 @@ Part 1:
 
 Part 2:
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/osbm/unet_explainer/blob/main/tutorial.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/osbm/unet_explainer/blob/main/tutorial-part2.ipynb)
 
 ## Note if you want to run it locally
 
@@ -36,4 +36,21 @@ Then you can run the notebooks with jupyter in browser or in VSCode:
 
 ```
 jupyter notebook
+```
+
+
+# Citation for the dataset
+```bibtex
+@article{ADAMS2022105817,
+    title = {Prostate158 - An expert-annotated 3T MRI dataset and algorithm for prostate cancer detection},
+    journal = {Computers in Biology and Medicine},
+    volume = {148},
+    pages = {105817},
+    year = {2022},
+    issn = {0010-4825},
+    doi = {https://doi.org/10.1016/j.compbiomed.2022.105817},
+    url = {https://www.sciencedirect.com/science/article/pii/S0010482522005789},
+    author = {Lisa C. Adams and Marcus R. Makowski and Günther Engel and Maximilian Rattunde and Felix Busch and Patrick Asbach and Stefan M. Niehues and Shankeeth Vinayahalingam and Bram {van Ginneken} and Geert Litjens and Keno K. Bressem},
+    keywords = {Prostate cancer, Deep learning, Machine learning, Artificial intelligence, Magnetic resonance imaging, Biparametric prostate MRI}
+}
 ```
