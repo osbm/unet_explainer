@@ -10,7 +10,7 @@ def set_seed(seed=42):
     torch.manual_seed(seed)
     print(f"Seed set to {seed}.")
 
-    
+
 def get_parameter_number(model=None):
     # pytorch_total_params
     total = 0
@@ -66,17 +66,22 @@ def plot_overlay_4x4(batch, alpha=0.5):
     plt.show()
 
 def plot_predictions(x, y, y_pred, num_examples_to_plot=3, shuffle=True):
-    if shuffle:
-        indices = np.random.choice(range(x.shape[0]), num_examples_to_plot, replace=False)
-    else:
-        indices = range(num_examples_to_plot)
-    fig, ax = plt.subplots(3, num_examples_to_plot, figsize=(num_examples_to_plot * 3, 9))
-    for i, idx in enumerate(indices):
-        ax[0][i].imshow(x[idx, 0], cmap="gray")
-        ax[1][i].imshow(y[idx, 0], cmap="gray")
-        ax[2][i].imshow(y_pred[idx, 0], cmap="gray")
-        ax[0][i].axis("off")
-        ax[1][i].axis("off")
-        ax[2][i].axis("off")
+    fig, ax = plt.subplots(num_examples_to_plot, 3, figsize=(9, num_examples_to_plot * 3))
+    for i in range(num_examples_to_plot):
+        if shuffle:
+            idx = np.random.randint(0, len(x))
+        else:
+            idx = i
+        image = x[idx]
+        mask = y[idx]
+        pred_mask = y_pred[idx]
+        ax[i][0].imshow(image[0][0], cmap="gray")
+        ax[i][1].imshow(image[0][0], cmap="gray")
+        ax[i][1].imshow(mask[0], cmap="jet", alpha=0.5)
+        ax[i][2].imshow(image[0][0], cmap="gray")
+        ax[i][2].imshow(pred_mask, cmap="jet", alpha=0.5)
+        ax[i][0].axis("off")
+        ax[i][1].axis("off")
+        ax[i][2].axis("off")
     plt.tight_layout()
     plt.show()

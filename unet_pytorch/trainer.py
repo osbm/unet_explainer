@@ -43,7 +43,7 @@ def fit_model(
             optimizer.zero_grad()
 
             outputs = model(images)
-            outputs = torch.softmax(outputs, dim=1)
+            outputs = torch.sigmoid(outputs)
 
             loss_value = loss(outputs, masks)
             loss_value.backward()
@@ -99,7 +99,7 @@ def fit_model(
                 masks = masks.to(device)
 
                 outputs = model(images)
-                outputs = torch.softmax(outputs, dim=1)
+                outputs = torch.sigmoid(outputs)
 
                 loss_value = loss(outputs, masks)
 
@@ -141,11 +141,7 @@ def fit_model(
     return model, history
 
 
-def predict(
-    model: nn.Module=None,
-    test_loader: torch.utils.data.DataLoader=None,
-    device: torch.types.Device=None,
-) -> Tuple[torch.Tensor, torch.Tensor]:
+def predict(model, test_loader=None, device=None):
 
     model.eval()
 
@@ -153,19 +149,19 @@ def predict(
     y_pred = []
     y = []
     with torch.no_grad():
-        for batch in tqdm(test_loader):
-            images, masks = batch
+        for images, masks in tqdm(test_loader):
             images = images.to(device)
             masks = masks.to(device)
 
             outputs = model(images)
-            outputs = torch.softmax(outputs, dim=1)
+            outputs = torch.sigmoid(outputs)
 
             y_pred.append(outputs.argmax(dim=1).detach().cpu())
             y.append(masks.detach().cpu())
             x.append(images.detach().cpu())
 
-    y_pred = torch.cat(y_pred)
+    x = torch.cat(x)
     y = torch.cat(y)
+    y_pred = torch.cat(y_pred)
 
     return x, y, y_pred
