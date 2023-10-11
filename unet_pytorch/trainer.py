@@ -43,7 +43,7 @@ def fit_model(
             optimizer.zero_grad()
 
             outputs = model(images)
-            outputs = torch.sigmoid(outputs)
+            outputs = torch.softmax(outputs, dim=1)
 
             loss_value = loss(outputs, masks)
             loss_value.backward()
@@ -99,7 +99,7 @@ def fit_model(
                 masks = masks.to(device)
 
                 outputs = model(images)
-                outputs = torch.sigmoid(outputs)
+                outputs = torch.softmax(outputs, dim=1)
 
                 loss_value = loss(outputs, masks)
 
@@ -154,7 +154,7 @@ def predict(model, test_loader=None, device=None):
             masks = masks.to(device)
 
             outputs = model(images)
-            outputs = torch.sigmoid(outputs)
+            outputs = torch.softmax(outputs, dim=1)
 
             y_pred.append(outputs.argmax(dim=1).detach().cpu())
             y.append(masks.detach().cpu())
