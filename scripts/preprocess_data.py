@@ -50,8 +50,8 @@ def process_df(df, output_dir):
             mask_idx += 1
 
 if __name__ == "__main__":
-    dspath = Path("../data-raw/")
-    saving_path = Path("data2/")
+    dspath = Path("../data-raw/") # original prostate158 dataset
+    saving_path = Path("data/") # output preprocessed dataset
 
     train_df = pd.read_csv(dspath / "train.csv")
     valid_df = pd.read_csv(dspath / "valid.csv")
