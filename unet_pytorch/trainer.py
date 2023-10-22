@@ -109,8 +109,14 @@ def predict(model, test_loader=None, device=None, final_activation="softmax", ca
     x = []
     y_pred = []
     y = []
+    
+    if calculate_scores:
+        dice_metric = DiceHelper(include_background=True, softmax=True, reduction="mean")
+        iou_metric = JaccardIndex(num_classes=3, task="multiclass").to(device)
 
-
+        test_dice_score = 0
+        test_iou_score = 0
+    
     with torch.no_grad():
         for images, masks in tqdm(test_loader):
             images, masks = images.to(device), masks.to(device)
@@ -118,6 +124,10 @@ def predict(model, test_loader=None, device=None, final_activation="softmax", ca
 
             outputs = model(images)
             
+            if calculate_scores:
+                dice_score, _ = dice_metric(outputs, masks)
+                iou_score = iou_metric(outputs.argmax(dim=1), masks.squeeze())
+
             if final_activation == "softmax":
                 outputs = torch.softmax(outputs, dim=1)
             elif final_activation == "sigmoid":
@@ -127,23 +137,22 @@ def predict(model, test_loader=None, device=None, final_activation="softmax", ca
             else:
                 raise ValueError("final_activation must be either softmax, sigmoid or none")
 
+            test_dice_score += dice_score.item()
+            test_iou_score += iou_score.item()
 
             y_pred.append(outputs.argmax(dim=1).detach().cpu())
             y.append(masks.detach().cpu())
             x.append(images.detach().cpu())
+        
 
     x = torch.cat(x)
     y = torch.cat(y)
     y_pred = torch.cat(y_pred)
 
     if calculate_scores:
-        dice_metric = DiceHelper(include_background=True, reduction="mean")
-        iou_metric = JaccardIndex(num_classes=3, task="multiclass")
-
-        dice_score, _ = dice_metric(y_pred, y)
-        iou_score = iou_metric(y_pred, y.squeeze())
-
-        print(f"Dice score: {dice_score.item()}")
-        print(f"IoU score: {iou_score}")
+        test_dice_score /= len(test_loader)
+        test_iou_score /= len(test_loader)
+        print(f"Dice score: {test_dice_score}")
+        print(f"IoU score: {test_iou_score}")
 
     return x, y, y_pred
