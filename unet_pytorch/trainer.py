@@ -13,7 +13,7 @@ def fit_model(
     device=None,
     epochs=10
 ):
-    model.train()
+    
     best_valid_loss = float("inf")
     history = {
         "train_loss": [],
@@ -27,6 +27,7 @@ def fit_model(
     dice_metric = DiceHelper(include_background=True, softmax=True, reduction="mean")
     iou_metric = JaccardIndex(num_classes=3, task="multiclass").to(device)
     for epoch in range(epochs):
+        model.train()
         train_epoch_loss = 0
         train_dice_scores = 0
         train_iou_scores = 0
