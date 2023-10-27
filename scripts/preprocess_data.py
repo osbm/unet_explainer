@@ -15,7 +15,7 @@ def normalize(x):
     return x_norm
 
 
-def process_df(df, output_dir):
+def process_df(df, output_dir, label_ratio_threshold=0.06):
 
     output_dir = Path(output_dir)
     os.makedirs(output_dir, exist_ok=True)
@@ -42,7 +42,7 @@ def process_df(df, output_dir):
             
             label_ratio = counts[1:].sum() / (mask_array.shape[0] * mask_array.shape[1])
 
-            if label_ratio < 0.06:
+            if label_ratio < label_ratio_threshold:
                 continue
 
             matplotlib.image.imsave(output_dir / "image" / f'patient_{patient_index}_{mask_idx}.png', image_array, cmap="gray")

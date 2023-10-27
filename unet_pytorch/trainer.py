@@ -117,7 +117,7 @@ def predict(model, test_loader=None, device=None, final_activation="softmax", ca
 
         test_dice_score = 0
         test_iou_score = 0
-    
+    test_dice_scores = []
     with torch.no_grad():
         for images, masks in tqdm(test_loader):
             images, masks = images.to(device), masks.to(device)
@@ -140,15 +140,23 @@ def predict(model, test_loader=None, device=None, final_activation="softmax", ca
 
             test_dice_score += dice_score.item()
             test_iou_score += iou_score.item()
-
-            y_pred.append(outputs.argmax(dim=1).detach().cpu())
+            test_dice_scores.append(dice_score.item())
+            y_pred.append(outputs.argmax(dim=1).detach().cpu().unsqueeze(1))
             y.append(masks.detach().cpu())
             x.append(images.detach().cpu())
-        
+    
 
-    x = torch.cat(x)
-    y = torch.cat(y)
-    y_pred = torch.cat(y_pred)
+    # now sort x, y and y_pred by dice score
+    if calculate_scores:
+        test_dice_scores = torch.tensor(test_dice_scores)
+        _, indices = torch.sort(test_dice_scores, descending=True)
+        x = torch.cat(x)[indices]
+        y = torch.cat(y)[indices]
+        y_pred = torch.cat(y_pred)[indices]
+    else:
+        x = torch.cat(x)
+        y = torch.cat(y)
+        y_pred = torch.cat(y_pred)
 
     if calculate_scores:
         test_dice_score /= len(test_loader)

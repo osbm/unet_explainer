@@ -79,7 +79,7 @@ def plot_overlay_4x2(batch, alpha=0.5):
             ax[i, j].axis('off')
     plt.show()
 
-def plot_predictions(x, y, y_pred, num_examples_to_plot=3, shuffle=True):
+def plot_predictions(x, y, y_pred, num_examples_to_plot=3, shuffle=False):
     fig, ax = plt.subplots(num_examples_to_plot, 3, figsize=(9, num_examples_to_plot * 3))
     for i in range(num_examples_to_plot):
         if shuffle:
