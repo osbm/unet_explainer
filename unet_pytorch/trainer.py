@@ -42,7 +42,7 @@ def fit_model(
 
             dice_score, _ = dice_metric(outputs, masks)
 
-            iou_score = iou_metric(outputs.argmax(dim=1), masks.squeeze())
+            iou_score = iou_metric(outputs.argmax(dim=1).squeeze(), masks.squeeze())
             train_dice_scores += dice_score.item()
             train_iou_scores += iou_score.item()
             train_epoch_loss += loss_value.item()
