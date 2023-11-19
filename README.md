@@ -10,6 +10,11 @@ Part 2:
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/osbm/unet_explainer/blob/main/tutorial-part2.ipynb)
 
+Part 2 Solutions:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/osbm/unet_explainer/blob/main/tutorial-part2-solutions.ipynb)
+
+
 ## Note if you want to run it locally
 
 First clone the repository:
